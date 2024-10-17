@@ -1,0 +1,35 @@
+// script標籤會長這樣
+//<script src="https://wows-ai.dev/single.js?replace_id=content&article_id=G0Ocebt06wrmou3L2SVm"></script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const script = document.currentScript;
+    const url = new URL(script.src);
+
+    // 取得 URL 中的參數
+    const replaceId = url.searchParams.get('replace_id');
+    const articleId = url.searchParams.get('article_id');
+
+    // 單頁資料結構,fetch by article id
+    // 從API拿到的資料,透過articleId
+    const fetchData = {
+        "id": "G0Ocebt06wrmou3L2SVm",
+        "title": "About chris",
+        "content": "# Hello, World! fuck you  This is a **Markdown** example.  - Item 1 - Item 2 - Item 3",
+        "created_at": 1728900483237,
+        "updated_at": 1728900483237,
+        "user_id": "CQ8tn9YXkYWat3myR3oLXRNggsT2"
+    };
+    
+    const contentDiv = document.getElementById(replaceId);
+    // 資料內容後續使用fetch取得firebase中的資料組成
+    const message = `
+    <div>
+        <h2>${fetchData.title}</h2>
+        <p>${fetchData.content}</p>\
+    </div>
+    `;
+
+    // 將 HTML 內容插入到 content div 中
+    contentDiv.innerHTML = message;
+});
+
