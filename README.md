@@ -1,0 +1,2 @@
+# seo-manager-js
+js 
