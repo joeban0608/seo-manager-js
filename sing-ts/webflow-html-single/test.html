@@ -1,0 +1,188 @@
+
+<div id="category-buttons"></div>
+<!-- 用來顯示文章分類按鈕 -->
+<div id="blog-posts"></div>
+<!-- 用來顯示文章列表 -->
+<div id="pagination"></div>
+<!-- 用來顯示分頁按鈕 -->
+
+<script>
+  const apiUrl = "https://318win.blog/wp-json/wp/v2/posts?_embed&per_page=100"; // 每頁最多抓取 100 篇文章
+  let currentPage = 1;
+  const postsPerPage = 10;
+  let allPosts = []; // 存儲所有文章
+  let selectedCategory = ""; // 當前選擇的分類
+
+  // 加載所有頁面的文章，直到抓取完畢
+  async function fetchAllPosts(page = 1, shouldScroll = false) {
+    let fetchedAllPosts = false;
+    let tempPosts = []; // 臨時存儲抓取的文章
+
+    try {
+      while (!fetchedAllPosts) {
+        const response = await fetch(`${apiUrl}&page=${page}`); // 按頁面逐次抓取
+        if (!response.ok) throw new Error("Error fetching posts");
+
+        const data = await response.json();
+        tempPosts = tempPosts.concat(data); // 合併新抓取的文章
+
+        // 如果抓取的文章數量小於每頁的最大值，代表已經抓取完所有文章
+        if (data.length < 100) {
+          fetchedAllPosts = true;
+        } else {
+          page++; // 繼續抓取下一頁
+        }
+      }
+
+      // 只保留分類為 "Slot games" 和 "318Promo" 的文章
+      allPosts = tempPosts.filter((post) => {
+        return post._embedded["wp:term"][0].some((cat) =>
+          ["Slot games", "318Promo"].includes(cat.name)
+        );
+      });
+
+      // 隨機排列文章
+      allPosts = allPosts.sort(() => 0.5 - Math.random());
+
+      displayPosts(currentPage); // 顯示當前頁面的文章
+      renderPagination(); // 顯示分頁按鈕
+
+      if (shouldScroll) scrollToFirstPost(); // 滾動到文章頂部
+    } catch (error) {
+      console.error("Error fetching WordPress posts:", error);
+    }
+  }
+
+  // 顯示分類按鈕
+  function displayCategoryButtons() {
+    const categories = ["Slot games", "318Promo"];
+    let buttonsHTML = "";
+
+    categories.forEach((category) => {
+      buttonsHTML += `<button class="${
+        category === selectedCategory ? "active" : ""
+      }" onclick="filterByCategory('${category}')">${category}</button>`;
+    });
+
+    document.getElementById("category-buttons").innerHTML = buttonsHTML;
+  }
+
+  // 根據分類過濾文章
+  function filterByCategory(category) {
+    selectedCategory = category;
+    currentPage = 1; // 切換分類時重設頁數
+    displayPosts(currentPage); // 只顯示當前頁的文章
+    renderPagination(); // 更新分頁
+  }
+
+  // 從文章內容中提取第一個圖片 URL
+  function extractFirstImage(content) {
+    const imgTagMatch = content.match(/<img[^>]+src="?([^"\s]+)"?[^>]*>/);
+    return imgTagMatch ? imgTagMatch[1] : "https://via.placeholder.com/350x150";
+  }
+
+  // 顯示當前頁面的文章
+  function displayPosts(page) {
+    const start = (page - 1) * postsPerPage;
+    let selectedPosts = allPosts.slice(start, start + postsPerPage);
+
+    // 如果選擇了分類，根據分類過濾文章
+    if (selectedCategory) {
+      selectedPosts = selectedPosts.filter((post) => {
+        return post._embedded["wp:term"][0].some(
+          (cat) => cat.name === selectedCategory
+        );
+      });
+    }
+
+    let postsHTML = "";
+    selectedPosts.forEach((post) => {
+      const featuredImage =
+        post._embedded && post._embedded["wp:featuredmedia"]
+          ? post._embedded["wp:featuredmedia"][0].source_url
+          : extractFirstImage(post.content.rendered); // 提取文章中的第一個圖片
+
+      const postDate = new Date(post.date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      const categories =
+        post._embedded["wp:term"] && post._embedded["wp:term"][0]
+          ? post._embedded["wp:term"][0].map((cat) => cat.name).join(", ")
+          : "Uncategorized";
+
+      postsHTML += `
+        <div class="blog-post" onclick="redirectToPost(${post.id})">
+          <div class="blog-image">
+            <img src="${featuredImage}" alt="${post.title.rendered}">
+          </div>
+          <div class="blog-content">
+            <div class="post-date">${postDate}</div>
+            <h2>${post.title.rendered}</h2>
+            <p>${post.excerpt.rendered}</p>
+            <div class="category-label">${categories}</div>
+          </div>
+        </div>
+      `;
+    });
+
+    document.getElementById("blog-posts").innerHTML = postsHTML;
+  }
+
+  // 顯示分頁按鈕
+  function renderPagination() {
+    const totalPages = Math.ceil(allPosts.length / postsPerPage);
+    let paginationHTML = "";
+
+    if (currentPage > 1) {
+      paginationHTML += `<button onclick="changePage(${
+        currentPage - 1
+      })">Previous</button>`;
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+      paginationHTML += `<button class="${
+        i === currentPage ? "active" : ""
+      }" onclick="changePage(${i})">${i}</button>`;
+    }
+
+    if (currentPage < totalPages) {
+      paginationHTML += `<button onclick="changePage(${
+        currentPage + 1
+      })">Next</button>`;
+    }
+
+    document.getElementById("pagination").innerHTML = paginationHTML;
+  }
+
+  // 切換頁面
+  function changePage(page) {
+    currentPage = page;
+    displayPosts(currentPage); // 只顯示當前頁的文章
+    renderPagination(); // 更新分頁
+  }
+
+  // 跳轉到文章詳細頁面
+  function redirectToPost(postId) {
+    window.location.href = `/posts?post_id=${postId}`;
+  }
+
+  // 滾動到第一篇文章
+  function scrollToFirstPost() {
+    const blogPosts = document.getElementById("blog-posts");
+    if (blogPosts) {
+      blogPosts.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }
+
+  // 初始化
+  document.addEventListener("DOMContentLoaded", function () {
+    displayCategoryButtons(); // 顯示分類按鈕
+    fetchAllPosts(currentPage, false); // 每次載入時抓取並顯示文章
+  });
+</script>

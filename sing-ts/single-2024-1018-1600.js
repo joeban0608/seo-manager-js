@@ -5,7 +5,6 @@ console.log("script", script);
 
 if (!script) {
   console.error("Script element not found.");
-  return; // 提前返回以避免后续错误
 }
 
 // <script src="https://wows-ai.dev/single.js?replace_id=blog-posts&article_id=pr14QyolSnRKIkFHG9uV"></script>
@@ -15,11 +14,10 @@ console.log("script_url", script_url);
 const replaceElementId = script_url.searchParams.get("replace_id");
 const article_Id = script_url.searchParams.get("article_id");
 
-if (!replaceElementId || article_Id) {
+if (!replaceElementId || !article_Id) {
   console.error(
     "replaceElementId and article id is required in single script.js"
   );
-  return;
 }
 // https://seo-manager.wows-ai.dev/api/article?id={id}
 const apiUrl = "https://seo-manager.wows-ai.dev/api/article"; // 每頁最多抓取 100 篇文章
