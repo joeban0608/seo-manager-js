@@ -1,5 +1,5 @@
 // script標籤會長這樣
-//<script src="https://storage.googleapis.com/seo-js/multiple.js?replace_id=content&domain=bonus365"></script>
+//<script src="https://storage.googleapis.com/seo-js/list.js?replace_id=content&domain=bonus365"></script>
 
 document.addEventListener("DOMContentLoaded", function () {
     const script = document.currentScript;
