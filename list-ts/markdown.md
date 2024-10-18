@@ -6,3 +6,5 @@
   - get method: https://seo-manager.wows-ai.dev/api/deploy-article
     - 再自己 filter by domain，找出文章秀出 List
     - 無分頁功能，列出全部。
+  - filter by domain-article-list 之後，重新組合 article_id 為 [] => [id1, id2, ...]
+  - 再 fetch 每一篇文章渲染畫面

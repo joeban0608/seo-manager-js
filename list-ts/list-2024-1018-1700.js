@@ -2,36 +2,10 @@
 //<script src="https://storage.googleapis.com/seo-js/list.js?replace_id=content&domain=masaya365tayataya.win"></script>
 
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-// const script =
-//   document.currentScript || document.querySelector('script[src*="list"]');
-// console.log("script", script);
-
-// if (!script) {
-//   console.error("Script element not found.");
-// }
-
-// const script_url = new URL(script.src);
-// console.log("script_url", script_url);
-// // 取得 URL 中的參數
-// const replaceElementId = script_url.searchParams.get("replace_id");
-// const domain = script_url.searchParams.get("domain");
-
-// if (!replaceElementId || !article_Id) {
-//   console.error(
-//     "replaceElementId and article id is required in single script.js"
-//   );
-// }
 
 const replaceElementId = "blog-posts";
 const domain = "masaya365tayataya.win";
-// https://seo-manager.wows-ai.dev/api/article?id={id}
-/* 
-  - fetch https://seo-manager.wows-ai.dev/api/deploy-article
-  - 拿到所有 deploy-article-List 
-  - filter deploy-article-List by domain 
-  - render deploy-article-List
 
-*/
 const apiUrl = "https://seo-manager.wows-ai.dev/api/deploy-article"; // 每頁最多抓取 100 篇文章
 // const article_id = "pr14QyolSnRKIkFHG9uV";
 let allPostList = []; // 存儲所有文章
