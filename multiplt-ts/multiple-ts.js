@@ -1,49 +1,83 @@
 // script標籤會長這樣
 //<script src="https://wows-ai.dev/multiple.js?replace_id=content&article_ids=G0Ocebt06wrmou3L2SVm,twbwWsIykpmUKM57HXhW"></script>
-// 
-document.addEventListener("DOMContentLoaded", function () {
-  const script = document.currentScript;
-  const url = new URL(script.src);
+import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+const script =
+  document.currentScript || document.querySelector('script[src*="multiple"]');
 
-  // 取得 URL 中的參數
-  const replaceId = url.searchParams.get("replace_id");
-  const articleIds = url.searchParams.get("article_id");
+if (!script) {
+  console.error("Script element not found.");
+}
 
-  // 單頁資料結構,fetch by article ids
-  // 從API拿到的資料,articleIds
-  const fetchData = [
-    {
-      id: "G0Ocebt06wrmou3L2SVm",
-      title: "About chris",
-      content:
-        "# Hello, World! fuck you  This is a **Markdown** example.  - Item 1 - Item 2 - Item 3",
-      created_at: 1728900483237,
-      updated_at: 1728900483237,
-      user_id: "CQ8tn9YXkYWat3myR3oLXRNggsT2",
-    },
-    {
-      id: "twbwWsIykpmUKM57HXhW",
-      content:
-        "# Hello, World!  This is a **Markdown** example.  - Item 1 - Item 2 - Item 3",
-      created_at: 1728899633949,
-      user_id: "CQ8tn9YXkYWat3myR3oLXRNggsT2",
-      updated_at: 1728899818384,
-      title: "chris",
-    },
-  ];
+const script_url = new URL(script.src);
+// 取得 URL 中的參數
+const replaceElementId = script_url.searchParams.get("replace_id");
+const article_ids = script_url.searchParams.get("article_ids");
 
-  const contentDiv = document.getElementById(replaceId);
-  let message = "";
-  // 資料內容後續使用fetch取得firebase中的資料組成
-  fetchData.forEach((item) => {
-    message += `
-        <div>
-            <h2>${item.title}</h2>
-            <p>${item.content}</p>\
-        </div>
-        `;
+if (!replaceElementId || !article_ids) {
+  console.error(
+    "replaceElementId and article_Ids is required in multiple script.js"
+  );
+}
+// https://seo-manager.wows-ai.dev/api/article?id={id}
+const apiUrl = "https://seo-manager.wows-ai.dev/api/article"; // 每頁最多抓取 100 篇文章
+// const article_id = "pr14QyolSnRKIkFHG9uV";
+let postInfo = null; // 存儲所有文章
+// 加載所有頁面的文章，直到抓取完畢
+async function fetchPosts() {
+  const url = `${apiUrl}?id=${article_Id}`;
+  try {
+    const response = await fetch(url); // 按頁面逐次抓取
+    if (!response.ok) throw new Error("Error fetching posts");
+    const getPostRes = await response.json();
+    if (!getPostRes?.data) throw new Error("post data is empty");
+    postInfo = getPostRes.data;
+    // 如果抓取的文章數量小於每頁的最大值，代表已經抓取完所有文章
+    // 只保留分類為 "Slot games" 和 "318Promo" 的文章
+    // 隨機排列文章
+    displayPosts(); // 顯示當前頁面的文章
+  } catch (error) {
+    console.error("Error fetching WordPress posts:", error);
+    return { error: `Error fetching WordPress posts: ${error}` };
+  }
+}
+
+// 顯示當前頁面的文章
+function displayPosts() {
+  // 如果選擇了分類，根據分類過濾文章
+  let postsHTML = "";
+  if (!postInfo) {
+    postsHTML = "Post in not found";
+    return;
+  }
+
+  const postDate = new Date(postInfo.updated_at).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
-  // 將 HTML 內容插入到 content div 中
-  contentDiv.innerHTML = message;
+  postsHTML += `
+    <div class="blog-post" onclick="redirectToPost(${postInfo.title})">
+      <div class="blog-image">
+        <img src="${postInfo.cover_url}" alt="${postInfo.title}">
+      </div>
+      <div class="blog-content">
+        <div class="post-date">${postDate}</div>
+        <h2>${postInfo.title}</h2>
+        <p>${marked.parse(postInfo.content)}</p>
+      </div>
+    </div>
+  `;
+  document.getElementById(replaceElementId).innerHTML = postsHTML;
+}
+// 顯示分頁按鈕
+
+// // 跳轉到文章詳細頁面
+// function redirectToPost(postId) {
+//   window.location.href = `/posts?post_id=${postId}`;
+// }
+
+// 初始化
+document.addEventListener("DOMContentLoaded", function () {
+  fetchPosts(); // 每次載入時抓取並顯示文章
 });
