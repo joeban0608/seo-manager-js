@@ -6994,7 +6994,6 @@
 
           const article_ids = "pr14QyolSnRKIkFHG9uV,nKNAEuwsJklwkuYWKuEb";
           const articleList = article_ids.split(",");
-          console.log("articleList", articleList);
 
           const apiUrl = "https://seo-manager.wows-ai.dev/api/article"; // API URL
           let allPostsInfo = []; // 用來存儲所有文章信息
@@ -7038,11 +7037,15 @@
               );
 
               postsHTML += `
-                <div class="blog-post" onclick="redirectToPost('${
-                  postInfo.title
-                }')">
-                  <div class="blog-image">
-                    <img src="${postInfo.cover_url}" alt="${postInfo.title}">
+                <div class="blog-post">
+                  <div class="blog-image" style="position: relative;">
+                    <img src="${postInfo.cover_url}" alt="${
+                                postInfo.title
+                              }" style="width: 100%; height: auto;">
+                    <div id="preview-pre-btn" style="position: absolute; display: flex; justify-content: space-between; width: 100%; top: 50%; transform: translateY(-50%);">
+                      <button style="margin-left: 12px;">&lt;&lt;</button>
+                      <button style="margin-right: 12px;">&gt;&gt;</button>
+                    </div>
                   </div>
                   <div class="blog-content">
                     <div class="post-date">${postDate}</div>
