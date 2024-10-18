@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 單頁資料結構,fetch by domain
     // 從API拿到的資料,articleIds
+    // fetch deploy-article 在自己 filter by domain，找出文章秀出 List
     const fetchData = [
         {
             "id": "G0Ocebt06wrmou3L2SVm",
