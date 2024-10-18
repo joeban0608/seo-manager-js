@@ -1,15 +1,13 @@
+// <script src="https://storage.googleapis.com/seo-js/single.js?replace_id=blog-posts&article_id=pr14QyolSnRKIkFHG9uV"></script>
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 const script =
   document.currentScript || document.querySelector('script[src*="single"]');
-console.log("script", script);
 
 if (!script) {
   console.error("Script element not found.");
 }
 
-// <script src="https://wows-ai.dev/single.js?replace_id=blog-posts&article_id=pr14QyolSnRKIkFHG9uV"></script>
 const script_url = new URL(script.src);
-console.log("script_url", script_url);
 // 取得 URL 中的參數
 const replaceElementId = script_url.searchParams.get("replace_id");
 const article_Id = script_url.searchParams.get("article_id");

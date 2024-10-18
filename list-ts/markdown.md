@@ -1,5 +1,5 @@
 # list.js 的引用方式：
-- https://storage.googleapis.com/seo-js/list.js?replace_id=list&domain=bonus365hulaan.win
+- https://storage.googleapis.com/seo-js/list.js?replace_id=blog-posts&domain=masaya365tayataya.win
   - replace_id 要取代的區塊 id，對應 html 上顯示的區塊
   - domain 查詢 domain 有哪些文章
   - 對應 seo-manager deploy-article api
